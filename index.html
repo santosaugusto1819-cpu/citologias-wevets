@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeVets - Controle de Registro Citológico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0b1e36;    /* Azul Noturno Profundo */
+            --logo-we-color: #004b87;    /* Azul Escuro Identidade WeVets (da imagem 1000001734.png) */
+            --logo-vets-color: #00a3ff;  /* Azul Claro Identidade WeVets (da imagem 1000001734.png) */
+            --accent-color: #00b4d8;     /* Azul Cyan Veterinário */
+            --accent-hover: #0096b4;
+            --bg-color: #f8fafc;         /* Fundo Fallback */
+            --card-bg: rgba(255, 255, 255, 0.94); /* Card semi-transparente para o fundo aparecer */
+            --text-main: #1e293b;        /* Slate Escuro */
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Imagem de Fundo de Laboratório em Alta Definição (Focada em tons médicos/azuis) */
+            background: linear-gradient(rgba(11, 30, 54, 0.15), rgba(11, 30, 54, 0.25)), 
+                        url('https://images.unsplash.com/photo-1579154204601-01588f35116f?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1150px; /* Alargado sutilmente para acomodar a nova coluna */
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgb(0 0 0 / 0.15);
+            /* Efeito de vidro borrado (Glassmorphism) para destaque do conteúdo */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Topo e Identidade WeVets baseada na imagem 1000001734.png */
+        .header-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 45px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+
+        /* Estilização exata do logo tipográfico redondo da imagem */
+        .brand-title {
+            font-family: 'Nunito', 'Inter', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -1.5px;
+        }
+
+        .brand-title .we-text {
+            color: var(--logo-we-color);
+        }
+
+        .brand-title .vets-text {
+            color: var(--logo-vets-color);
+            margin-left: -1px; /* Ajuste sutil de aproximação das letras */
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 8px 0 0 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Metadados de Emissão */
+        .timestamp-container {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 18px;
+            display: flex;
+            gap: 20px;
+            background: #f1f5f9;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .triagem-badge {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        /* Seções de Títulos */
+        h2 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 16px;
+            background-color: var(--logo-vets-color);
+            border-radius: 2px;
+        }
+
+        /* Painel de Entrada Avançado */
+        .card {
+            background: rgba(250, 250, 250, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 45px;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-main);
+            background-color: #fff;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--logo-vets-color);
+            box-shadow: 0 0 0 4px rgba(0, 163, 255, 0.12);
+        }
+
+        /* Linhas e Campos Técnicos */
+        .manual-field-line {
+            display: block;
+            width: 90%;
+            border-bottom: 1px dotted #94a3b8;
+            height: 24px;
+        }
+
+        .manual-tick-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            height: 100%;
+        }
+
+        .manual-box-label {
+            font-size: 12px;
+            color: var(--text-main);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .manual-square {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+            margin-right: 6px;
+            background-color: #ffffff;
+            box-sizing: border-box;
+        }
+
+        /* Botões */
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 11px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add { background-color: var(--primary-color); color: white; }
+        .btn-add:hover { background-color: #132d4e; transform: translateY(-1px); }
+        
+        .btn-print { background-color: var(--logo-vets-color); color: white; padding: 8px 18px; border-radius: 20px;}
+        .btn-print:hover { background-color: #008be0; transform: translateY(-1px); }
+        
+        .btn-clear { background-color: transparent; color: #7f1d1d; border: 1px solid #fca5a5; }
+        .btn-clear:hover { background-color: #fef2f2; }
+
+        /* Ações da Tabela */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-table {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .btn-edit {
+            background-color: #fff;
+            color: #b45309;
+            border: 1px solid #f59e0b;
+        }
+        .btn-edit:hover { background-color: #fffbeb; }
+
+        .btn-delete {
+            background-color: #fff;
+            color: #b91c1c;
+            border: 1px solid #f87171;
+        }
+        .btn-delete:hover { background-color: #fef2f2; }
+
+        /* Tabela Design de Listagem Hospitalar */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 10px;
+            margin-bottom: 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--primary-color);
+            font-weight: 700;
+            padding: 16px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        /* Rodapé de Totais */
+        tfoot tr td {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            font-weight: 800;
+            padding: 16px;
+            border-top: 2px solid #cbd5e1;
+            border-bottom: none;
+        }
+
+        .total-highlight {
+            color: var(--logo-we-color);
+            font-weight: 800;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background-color: #fcfcfd; }
+        tr:hover td { background-color: #f1f5f9; }
+
+        /* Badges de Tipo de Exame */
+        .badge-tipo {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .type-default { background: #e2e8f0; color: #334155; }
+        .type-efusao { background: #fee2e2; color: #991b1b; } 
+        .type-paaf { background: #e0f2fe; color: #0369a1; }
+        .type-pele { background: #fef3c7; color: #92400e; }
+        .type-aud { background: #dcfce7; color: #166534; }
+        .type-lavado { background: #f3e8ff; color: #6b21a8; } 
+        .type-ectoparasita { background: #ffedd5; color: #c2410c; } 
+
+        /* Assinatura */
+        .signature-section {
+            margin-top: 60px;
+            border-top: 2px dashed var(--border-color);
+            padding-top: 35px;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+            margin-top: 45px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #64748b;
+            text-align: center;
+            padding-top: 10px;
+            font-size: 11px;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Engine de Impressão Limpa */
+        @media print {
+            body { background: #fff !important; padding: 0; color: #000; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; background: #fff !important; backdrop-filter: none; border: none; }
+            .no-print, .th-actions, .td-actions { display: none !important; }
+            .card { display: none; }
+            table { page-break-inside: auto; margin-top: 25px; border: 1px solid #000; border-radius: 0; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            th { background-color: #f1f5f9 !important; color: #000 !important; font-size: 10px; padding: 12px; border-bottom: 2px solid #000; }
+            td { font-size: 10px; padding: 10px 12px; border-bottom: 1px solid #cbd5e1; }
+            tfoot tr td { background-color: #e2e8f0 !important; color: #000 !important; border-top: 2px solid #000 !important; font-size: 11px; }
+            .badge-tipo { background: transparent !important; color: #000 !important; padding: 0; font-weight: bold; }
+            .manual-square { border: 2px solid #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .signature-section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Cabeçalho com Identidade Visual WeVets Fiel ao Logotipo fornecido -->
+    <div class="header-wrapper">
+        <div class="logo-container">
+            <h1 class="brand-title"><span class="we-text">We</span><span class="vets-text">Vets</span></h1>
+        </div>
+        <p class="subtitle">Controle de Registro Interno • Exames Citológicos</p>
+        
+        <div class="timestamp-container">
+            <div>Emissão: <span id="dataHoraAtual" style="color: #0f2a4a; font-weight: 700;">--/--/---- --:--:--</span></div>
+            <div>Triagem: <span id="triagemImpressa" class="triagem-badge">Mesa Técnica Aberta</span></div>
+        </div>
+    </div>
+    
+    <!-- Painel Entrada Ocultado na Impressão -->
+    <div class="card no-print">
+        <h2 id="tituloForm">Painel de Admissão & Triagem</h2>
+        <form id="registroForm">
+            <input type="hidden" id="editRowIndex" value="">
+
+            <div class="form-group" style="grid-template-columns: 1fr;">
+                <div>
+                    <label for="responsavelTriagem">Operador do Setor / Triagem</label>
+                    <input type="text" id="responsavelTriagem" placeholder="Insira seu nome ou iniciais para o relatório técnico" oninput="atualizarNomeTriagem(this.value)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <label for="data">Data de Entrada</label>
+                    <input type="date" id="data" required>
+                </div>
+                <div>
+                    <label for="paciente">Identificação do Paciente</label>
+                    <input type="text" id="paciente" placeholder="Nome do animal, Espécie ou ID" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <label for="tipo">Especialidade / Tipo de Citologia</label>
+                    <select id="tipo" required>
+                        <option value="" disabled selected>Selecione a categoria...</option>
+                        <option value="Conduto Auditivo">Conduto Auditivo</option>
+                        <option value="Pele / Cutâneo">Pele / Cutâneo</option>
+                        <option value="Aspirativa (PAAF)">Aspirativa (PAAF)</option>
+                        <option value="Citologia Vaginal">Citologia Vaginal</option>
+                        <option value="Efusão">Efusão (Líquidos/Cavitários)</option>
+                        <option value="Lavados">Lavados</option>
+                        <option value="Ectoparasitas">Ectoparasitas</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="laminas">Volume de Lâminas</label>
+                    <input type="number" id="laminas" min="0" value="1" required>
+                </div>
+                <div>
+                    <label for="tubos">Volume de Tubos</label>
+                    <input type="number" id="tubos" min="0" value="0" required>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button type="button" class="btn-clear" id="btnLimpar" onclick="limparTabela()">Limpar Tudo</button>
+                <button type="submit" class="btn-add" id="btnSalvar">Adicionar Registro</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Seção de Dados Consolidados -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2>Registros Consolidados em Laboratório</h2>
+        <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir Documento</button>
+    </div>
+
+    <div class="table-responsive">
+        <table id="tabelaRegistros">
+            <thead>
+                <tr>
+                    <th style="width: 12%">Data Entrada</th>
+                    <th style="width: 22%">Paciente</th>
+                    <th style="width: 22%">Tipo de Exame</th>
+                    <th style="text-align: center; width: 7%">Lâminas</th>
+                    <th style="text-align: center; width: 7%">Tubos</th>
+                    <th style="width: 13%">Responsável Técnico</th>
+                    <th style="width: 12%">Coloração</th>
+                    <th class="th-actions" style="width: 5%">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dinâmico via JS -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="8" style="text-align: left; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <span>Total de Pacientes Cadastrados: <strong id="totalCasos" class="total-highlight">0</strong></span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Validação Hospitalar Técnico -->
+    <div class="signature-section">
+        <h2>Protocolo de Conferência e Recebimento de Amostras</h2>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">
+            Confirmamos a integridade física e o recebimento das lâminas e tubos citológicos discriminados acima para processamento e coloração na bancada clínica.
+        </p>
+        
+        <div class="signature-grid">
+            <div class="signature-line" style="margin-top: 30px;">
+                Assinatura do Patologista / Técnico Responsável
+            </div>
+            <div class="signature-line" style="margin-top: 30px;">
+                Data / Horário de Recebimento
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('data').valueAsDate = new Date();
+
+    function atualizarNomeTriagem(nome) {
+        const elemento = document.getElementById('triagemImpressa');
+        elemento.textContent = nome.trim() === "" ? "Mesa Técnica Aberta" : nome.toUpperCase();
+    }
+
+    function atualizarRelogio() {
+        const agora = new Date();
+        const dia = String(agora.getDate()).padStart(2, '0');
+        const mes = String(agora.getMonth() + 1).padStart(2, '0');
+        const ano = agora.getFullYear();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const segundos = String(agora.getSeconds()).padStart(2, '0');
+        
+        document.getElementById('dataHoraAtual').textContent = `${dia}/${mes}/${ano} às ${horas}:${minutos}:${segundos}`;
+    }
+    
+    atualizarRelogio();
+    setInterval(atualizarRelogio, 1000);
+
+    function formatarDataParaExibicao(dataString) {
+        if(!dataString) return "";
+        const partes = dataString.split("-");
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    function obterClasseBadge(tipo) {
+        if(tipo.includes("Efusão")) return "badge-tipo type-efusao";
+        if(tipo.includes("PAAF") || tipo.includes("Aspirativa")) return "badge-tipo type-paaf";
+        if(tipo.includes("Pele")) return "badge-tipo type-pele";
+        if(tipo.includes("Auditivo")) return "badge-tipo type-aud";
+        if(tipo.includes("Lavados")) return "badge-tipo type-lavado";
+        if(tipo.includes("Ectoparasitas")) return "badge-tipo type-ectoparasita";
+        return "badge-tipo type-default";
+    }
+
+    function calcularTotais() {
+        const tabela = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
+        document.getElementById('totalCasos').textContent = tabela.rows.length;
+    }
+
+    document.getElementById('registroForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const data = document.getElementById('data').value;
+        const paciente = document.getElementById('paciente').value;
+        const tipo = document.getElementById('tipo').value;
+        const laminas = document.getElementById('laminas').value;
+        const tubos = document.getElementById('tubos').value;
+        const editIndex = document.getElementById('editRowIndex').value;
+
+        const tabela = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
+
+        if (editIndex === "") {
+            const novaLinha = tabela.insertRow();
+            configurarConteudoLinha(novaLinha, data, paciente, tipo, laminas, tubos);
+        } else {
+            const linhaExistente = tabela.rows[parseInt(editIndex)];
+            configurarConteudoLinha(linhaExistente, data, paciente, tipo, laminas, tubos);
+            
+            document.getElementById('editRowIndex').value = "";
+            document.getElementById('tituloForm').textContent = "Painel de Admissão & Triagem";
+            document.getElementById('btnSalvar').textContent = "Adicionar Registro";
+            document.getElementById('btnLimpar').textContent = "Limpar Tudo";
+        }
+
+        calcularTotais();
+
+        const responsavelTriagemAtual = document.getElementById('responsavelTriagem').value;
+        document.getElementById('registroForm').reset();
+        document.getElementById('responsavelTriagem').value = responsavelTriagemAtual;
+        document.getElementById('data').valueAsDate = new Date();
+        document.getElementById('laminas').value = 1;
+        document.getElementById('tubos').value = 0;
+    });
+
+    function configurarConteudoLinha(linha, data, paciente, tipo, laminas, tubos) {
+        linha.setAttribute('data-raw-date', data);
+        linha.setAttribute('data-raw-tipo', tipo); 
+        const classeBadge = obterClasseBadge(tipo);
+
+        linha.innerHTML = `
+            <td>${formatarDataParaExibicao(data)}</td>
+            <td style="font-weight: 600; color: var(--primary-color);">${paciente}</td>
+            <td><span class="${classeBadge}">${tipo}</span></td>
+            <td style="font-weight: 700; text-align: center; color: var(--primary-color);">${laminas}</td>
+            <td style="font-weight: 700; text-align: center; color: var(--accent-hover);">${tubos}</td>
+            <td>
+                <span class="manual-field-line"></span>
+            </td>
+            <td>
+                <div class="manual-tick-group">
+                    <span class="manual-box-label"><span class="manual-square"></span> M.G.</span>
+                    <span class="manual-box-label"><span class="manual-square"></span> Pan.</span>
+                </div>
+            </td>
+            <td class="td-actions">
+                <div class="action-buttons">
+                    <button type="button" class="btn-table btn-edit" onclick="editarLinha(this)">Editar</button>
+                    <button type="button" class="btn-table btn-delete" onclick="excluirLinha(this)">Excluir</button>
+                </div>
+            </td>
+        `;
+    }
+
+    function editarLinha(botao) {
+        const línea = botao.closest('tr');
+        const index = línea.rowIndex - 1;
+
+        const dataBruta = línea.getAttribute('data-raw-date');
+        const tipoBruto = línea.getAttribute('data-raw-tipo');
+        const paciente = línea.cells[1].textContent;
+        const laminas = línea.cells[3].textContent;
+        const tubos = línea.cells[4].textContent;
+
+        document.getElementById('data').value = dataBruta;
+        document.getElementById('paciente').value = paciente;
+        document.getElementById('laminas').value = laminas;
+        document.getElementById('tubos').value = tubos;
+        
+        const selectTipo = document.getElementById('tipo');
+        selectTipo.value = tipoBruto;
+
+        document.getElementById('editRowIndex').value = index;
+        document.getElementById('tituloForm').textContent = "⚠️ Corrigindo Registro de: " + paciente;
+        document.getElementById('btnSalvar').textContent = "Atualizar Linha";
+        document.getElementById('btnLimpar').textContent = "Cancelar Edição";
+        
+        document.getElementById('tituloForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function excluirLinha(botao) {
+        if(confirm("Deseja realmente remover este paciente da listagem consolidada?")) {
+            const linha = botao.closest('tr');
+            linha.remove();
+            calcularTotais();
+            cancelarEdicaoSeAtiva();
+        }
+    }
+
+    function limparTabela() {
+        const editIndex = document.getElementById('editRowIndex').value;
+        
+        if (editIndex !== "") {
+            cancelarEdicaoSeAtiva();
+        } else {
+            if(confirm("Atenção: Isso apagará TODOS os registros consolidados abaixo. Continuar?")) {
+                document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0].innerHTML = "";
+                calcularTotais();
+            }
+        }
+    }
+
+    function cancelarEdicaoSeAtiva() {
+        document.getElementById('editRowIndex').value = "";
+        document.getElementById('tituloForm').textContent = "Painel de Admissão & Triagem";
+        document.getElementById('btnSalvar').textContent = "Adicionar Registro";
+        document.getElementById('btnLimpar').textContent = "Limpar Tudo";
+        document.getElementById('registroForm').reset();
+        document.getElementById('data').valueAsDate = new Date();
+        document.getElementById('laminas').value = 1;
+        document.getElementById('tubos').value = 0;
+    }
+</script>
+</body>
+</html>
